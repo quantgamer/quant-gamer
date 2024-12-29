@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import TheWelcome from "../components/TheWelcome.vue";
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <nav>
+      <RouterLink to="/arithmeticgame">Arithmetic Game</RouterLink>
+    </nav>
   </main>
 </template>
