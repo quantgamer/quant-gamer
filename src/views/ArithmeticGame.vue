@@ -82,10 +82,10 @@ const randomInt = (min: number, max: number) => {
 
 const checkAnswer = () => {
   if (userAnswer.value === currentQuestion.answer) {
-    score.value += 1
-    generateQuestion()
+    score.value += 1;
+    generateQuestion();
   }
-}
+};
 </script>
 
 <template>
@@ -93,7 +93,6 @@ const checkAnswer = () => {
     <h1>Arithmetic Game</h1>
     <div class="game-container">
       <div v-if="!gameStarted" class="settings">
-        <h2>Settings</h2>
         <div>
           <label>
             <input type="checkbox" v-model="settings.includeAddition" /> Include
@@ -140,15 +139,18 @@ const checkAnswer = () => {
             <input type="number" v-model.number="settings.duration" />
           </label>
         </div>
-        <button @click="startGame"> Start Game</button>
+        <button @click="startGame">Start Game</button>
       </div>
       <div v-if="gameStarted && !gameOver" class="game">
-        <h2>Game</h2>
         <p>Score: {{ score }}</p>
         <p>Time Remaining: {{ timeRemaining }}</p>
         <div v-if="currentQuestion">
           <p>{{ currentQuestion.text }}</p>
-          <input type="number" v-model.number="userAnswer" @keyup="checkAnswer"/>
+          <input
+            type="number"
+            v-model.number="userAnswer"
+            @keyup="checkAnswer"
+          />
         </div>
       </div>
       <div v-if="gameOver">
@@ -157,7 +159,6 @@ const checkAnswer = () => {
       <div v-if="gameStarted">
         <button @click="backToSettings">Return to Settings</button>
       </div>
-
     </div>
     <nav>
       <RouterLink to="/">Home</RouterLink>
