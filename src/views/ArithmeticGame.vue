@@ -4,7 +4,7 @@ import { reactive, ref, type Reactive } from "vue";
 const gameStarted = ref(true);
 const score = ref(0);
 const timeRemaining = ref(0);
-const gameOver = ref(true);
+const gameOver = ref(false);
 const userAnswer = ref(null);
 
 const settings = reactive({
@@ -23,7 +23,7 @@ const updateTime = () => {
   } else endGame();
 };
 const startGame = () => {
-  gameStarted.value = !gameStarted.value;
+  gameStarted.value = true;
   gameOver.value = false;
 
   score.value = 0;
@@ -34,8 +34,12 @@ const startGame = () => {
 };
 
 const endGame = () => {
+  if (gameStarted.value) gameOver.value = true;
+};
+
+const backToSettings = () => {
   gameStarted.value = false;
-  gameOver.value = true;
+  gameOver.value = false;
 };
 
 interface Question {
@@ -136,8 +140,9 @@ const checkAnswer = () => {
             <input type="number" v-model.number="settings.duration" />
           </label>
         </div>
+        <button @click="startGame"> Start Game</button>
       </div>
-      <div v-else class="game">
+      <div v-if="gameStarted && !gameOver" class="game">
         <h2>Game</h2>
         <p>Score: {{ score }}</p>
         <p>Time Remaining: {{ timeRemaining }}</p>
@@ -146,7 +151,13 @@ const checkAnswer = () => {
           <input type="number" v-model.number="userAnswer" @keyup="checkAnswer"/>
         </div>
       </div>
-      <button @click="startGame" />
+      <div v-if="gameOver">
+        <p>Score: {{ score }}</p>
+      </div>
+      <div v-if="gameStarted">
+        <button @click="backToSettings">Return to Settings</button>
+      </div>
+
     </div>
     <nav>
       <RouterLink to="/">Home</RouterLink>
