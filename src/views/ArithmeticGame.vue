@@ -1,7 +1,20 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, type Reactive } from "vue";
 
 const gameStarted = ref(true);
+const score = ref(0);
+const timeRemaining = ref(0);
+const gameOver = ref(true);
+
+const settings = reactive({
+  includeAddition: true,
+  includeMultiplication: true,
+  additionMin: 2,
+  additionMax: 100,
+  multiplicationMin: 2,
+  multiplicationMax: 12,
+  duration: 120,
+});
 
 const updateTime = () => {
   if (timeRemaining.value > 0) {
@@ -14,8 +27,9 @@ const startGame = () => {
 
   score.value = 0;
   timeRemaining.value = settings.duration;
-
   setInterval(updateTime, 1000);
+
+  generateQuestion();
 };
 
 const endGame = () => {
@@ -23,19 +37,43 @@ const endGame = () => {
   gameOver.value = true;
 };
 
-const settings = reactive({
-  includeAddition: true,
-  includeMultiplication: true,
-  additionMin: 2,
-  additionMax: 100,
-  multiplicationMin: 2,
-  multiplicationMax: 12,
-  duration: 120,
+interface Question {
+  text: string;
+  answer: number;
+}
+
+const currentQuestion: Reactive<Question> = reactive({
+  text: "1 + 1 =",
+  answer: 2,
 });
 
-const score = ref(0);
-const timeRemaining = ref(0);
-const gameOver = ref(true);
+const generateQuestion = () => {
+  const operations = [];
+  if (settings.includeAddition) operations.push("addition");
+  if (settings.includeMultiplication) operations.push("multiplication");
+
+  const operation = operations[Math.floor(Math.random() * operations.length)];
+
+  let num1, num2, text, answer;
+  if (operation === "addition") {
+    num1 = randomInt(settings.additionMin, settings.additionMax);
+    num2 = randomInt(settings.additionMin, settings.additionMax);
+    text = `${num1} + ${num2} =`;
+    answer = num1 + num2;
+  } else if (operation === "multiplication") {
+    num1 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
+    num2 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
+    text = `${num1} x ${num2} =`;
+    answer = num1 * num2;
+  }
+
+  currentQuestion.text = text ?? "";
+  currentQuestion.answer = answer ?? 0;
+};
+
+const randomInt = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 </script>
 
 <template>
@@ -95,6 +133,9 @@ const gameOver = ref(true);
         <h2>Game</h2>
         <p>Score: {{ score }}</p>
         <p>Time Remaining: {{ timeRemaining }}</p>
+        <div v-if="currentQuestion">
+          {{ currentQuestion.text }}
+        </div>
       </div>
       <button @click="startGame" />
     </div>
