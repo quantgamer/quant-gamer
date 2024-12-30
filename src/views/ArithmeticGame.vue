@@ -3,10 +3,24 @@ import { reactive, ref } from "vue";
 
 const gameStarted = ref(true);
 
+const updateTime = () => {
+  if (timeRemaining.value > 0) {
+    timeRemaining.value -= 1;
+  } else endGame();
+};
 const startGame = () => {
   gameStarted.value = !gameStarted.value;
+  gameOver.value = false;
+
   score.value = 0;
   timeRemaining.value = settings.duration;
+
+  setInterval(updateTime, 1000);
+};
+
+const endGame = () => {
+  gameStarted.value = false;
+  gameOver.value = true;
 };
 
 const settings = reactive({
@@ -21,6 +35,7 @@ const settings = reactive({
 
 const score = ref(0);
 const timeRemaining = ref(0);
+const gameOver = ref(true);
 </script>
 
 <template>
