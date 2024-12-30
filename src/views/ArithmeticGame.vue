@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, type Reactive } from "vue";
 
-const gameStarted = ref(true);
+const gameStarted = ref(false);
 const score = ref(0);
 const timeRemaining = ref(0);
 const gameOver = ref(false);
