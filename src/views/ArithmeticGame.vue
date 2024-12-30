@@ -23,14 +23,16 @@ const updateTime = () => {
   } else endGame();
 };
 const startGame = () => {
-  gameStarted.value = true;
-  gameOver.value = false;
+  if (settings.includeAddition || settings.includeMultiplication) {
+    gameStarted.value = true;
+    gameOver.value = false;
 
-  score.value = 0;
-  timeRemaining.value = settings.duration;
-  setInterval(updateTime, 1000);
+    score.value = 0;
+    timeRemaining.value = settings.duration;
+    setInterval(updateTime, 1000);
 
-  generateQuestion();
+    generateQuestion();
+  }
 };
 
 const endGame = () => {
