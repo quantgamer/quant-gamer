@@ -5,6 +5,7 @@ const gameStarted = ref(true);
 const score = ref(0);
 const timeRemaining = ref(0);
 const gameOver = ref(true);
+const userAnswer = ref(null);
 
 const settings = reactive({
   includeAddition: true,
@@ -74,6 +75,13 @@ const generateQuestion = () => {
 const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+const checkAnswer = () => {
+  if (userAnswer.value === currentQuestion.answer) {
+    score.value += 1
+    generateQuestion()
+  }
+}
 </script>
 
 <template>
@@ -134,7 +142,8 @@ const randomInt = (min: number, max: number) => {
         <p>Score: {{ score }}</p>
         <p>Time Remaining: {{ timeRemaining }}</p>
         <div v-if="currentQuestion">
-          {{ currentQuestion.text }}
+          <p>{{ currentQuestion.text }}</p>
+          <input type="number" v-model.number="userAnswer" @keyup="checkAnswer"/>
         </div>
       </div>
       <button @click="startGame" />
