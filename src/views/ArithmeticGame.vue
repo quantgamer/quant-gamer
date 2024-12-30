@@ -3,7 +3,11 @@ import { reactive, ref } from "vue";
 
 const gameStarted = ref(true);
 
-const startGame = () => (gameStarted.value = !gameStarted.value);
+const startGame = () => {
+  gameStarted.value = !gameStarted.value;
+  score.value = 0;
+  timeRemaining.value = settings.duration;
+};
 
 const settings = reactive({
   includeAddition: true,
@@ -14,6 +18,9 @@ const settings = reactive({
   multiplicationMax: 12,
   duration: 120,
 });
+
+const score = ref(0);
+const timeRemaining = ref(0);
 </script>
 
 <template>
@@ -71,6 +78,8 @@ const settings = reactive({
       </div>
       <div v-else class="game">
         <h2>Game</h2>
+        <p>Score: {{ score }}</p>
+        <p>Time Remaining: {{ timeRemaining }}</p>
       </div>
       <button @click="startGame" />
     </div>
