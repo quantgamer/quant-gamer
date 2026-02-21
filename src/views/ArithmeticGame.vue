@@ -9,7 +9,9 @@ const userAnswer = ref(null);
 
 const settings = reactive({
   includeAddition: true,
+  includeSubtraction: false,
   includeMultiplication: true,
+  includeDivision: false,
   additionMin: 2,
   additionMax: 100,
   multiplicationMin: 2,
@@ -33,7 +35,7 @@ const updateTime = () => {
 };
 
 const startGame = () => {
-  if (settings.includeAddition || settings.includeMultiplication) {
+  if (settings.includeAddition || settings.includeSubtraction || settings.includeMultiplication || settings.includeDivision) {
     clearTimer();
     gameStarted.value = true;
     gameOver.value = false;
@@ -72,7 +74,9 @@ const currentQuestion: Reactive<Question> = reactive({
 const generateQuestion = () => {
   const operations = [];
   if (settings.includeAddition) operations.push("addition");
+  if (settings.includeSubtraction) operations.push("subtraction");
   if (settings.includeMultiplication) operations.push("multiplication");
+  if (settings.includeDivision) operations.push("division");
 
   const operation = operations[Math.floor(Math.random() * operations.length)];
 
@@ -82,11 +86,25 @@ const generateQuestion = () => {
     num2 = randomInt(settings.additionMin, settings.additionMax);
     text = `${num1} + ${num2} =`;
     answer = num1 + num2;
+  } else if (operation === "subtraction") {
+    // Generate two addends then ask for the difference, ensuring result is always positive
+    num1 = randomInt(settings.additionMin, settings.additionMax);
+    num2 = randomInt(settings.additionMin, settings.additionMax);
+    const total = num1 + num2;
+    text = `${total} − ${num2} =`;
+    answer = num1;
   } else if (operation === "multiplication") {
     num1 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
     num2 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
-    text = `${num1} x ${num2} =`;
+    text = `${num1} × ${num2} =`;
     answer = num1 * num2;
+  } else if (operation === "division") {
+    // Generate two factors then ask for the quotient — always a whole number
+    num1 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
+    num2 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
+    const product = num1 * num2;
+    text = `${product} ÷ ${num2} =`;
+    answer = num1;
   }
 
   currentQuestion.text = text ?? "";
@@ -121,7 +139,7 @@ const checkAnswer = () => {
             <input type="checkbox" v-model="settings.includeAddition" />
             <span class="op-symbol">+</span>
             <span class="op-label">Addition</span>
-            <div class="range-inputs" :class="{ hidden: !settings.includeAddition }">
+            <div class="range-inputs">
               <input
                 type="number"
                 v-model.number="settings.additionMin"
@@ -136,11 +154,20 @@ const checkAnswer = () => {
             </div>
           </label>
 
+          <label class="operation-card" :class="{ active: settings.includeSubtraction }">
+            <input type="checkbox" v-model="settings.includeSubtraction" />
+            <span class="op-symbol">−</span>
+            <span class="op-label">Subtraction</span>
+            <div class="range-inputs">
+              <span class="range-note">Reverse of addition</span>
+            </div>
+          </label>
+
           <label class="operation-card" :class="{ active: settings.includeMultiplication }">
             <input type="checkbox" v-model="settings.includeMultiplication" />
             <span class="op-symbol">×</span>
             <span class="op-label">Multiplication</span>
-            <div class="range-inputs" :class="{ hidden: !settings.includeMultiplication }">
+            <div class="range-inputs">
               <input
                 type="number"
                 v-model.number="settings.multiplicationMin"
@@ -152,6 +179,15 @@ const checkAnswer = () => {
                 v-model.number="settings.multiplicationMax"
                 placeholder="Max"
               />
+            </div>
+          </label>
+
+          <label class="operation-card" :class="{ active: settings.includeDivision }">
+            <input type="checkbox" v-model="settings.includeDivision" />
+            <span class="op-symbol">÷</span>
+            <span class="op-label">Division</span>
+            <div class="range-inputs">
+              <span class="range-note">Reverse of multiplication</span>
             </div>
           </label>
         </div>
@@ -330,7 +366,8 @@ h1 {
 
 /* Operation toggle cards */
 .operation-cards {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   width: 100%;
 }
@@ -382,8 +419,10 @@ h1 {
   margin-top: 0.25rem;
 }
 
-.range-inputs.hidden {
-  visibility: hidden;
+.range-note {
+  font-size: 0.78rem;
+  color: #aaa;
+  font-style: italic;
 }
 
 .range-inputs input {
