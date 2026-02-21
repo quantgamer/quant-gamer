@@ -17,29 +17,44 @@ const settings = reactive({
   duration: 120,
 });
 
+let timerInterval: ReturnType<typeof setInterval> | null = null;
+
+const clearTimer = () => {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+};
+
 const updateTime = () => {
   if (timeRemaining.value > 0) {
     timeRemaining.value -= 1;
   } else endGame();
 };
+
 const startGame = () => {
   if (settings.includeAddition || settings.includeMultiplication) {
+    clearTimer();
     gameStarted.value = true;
     gameOver.value = false;
 
     score.value = 0;
     timeRemaining.value = settings.duration;
-    setInterval(updateTime, 1000);
+    timerInterval = setInterval(updateTime, 1000);
 
     generateQuestion();
   }
 };
 
 const endGame = () => {
-  if (gameStarted.value) gameOver.value = true;
+  if (gameStarted.value) {
+    clearTimer();
+    gameOver.value = true;
+  }
 };
 
 const backToSettings = () => {
+  clearTimer();
   gameStarted.value = false;
   gameOver.value = false;
 };
