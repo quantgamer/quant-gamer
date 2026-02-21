@@ -11,10 +11,10 @@ const games = [
   {
     id: "probability",
     title: "Probability",
-    description: "Calculate chances and odds before the clock runs out.",
+    description: "Estimate expected profit and the chance a company is profitable given revenue and cost scenarios.",
     symbol: "%",
-    route: null,
-    available: false,
+    route: "/probabilitygame",
+    available: true,
   },
 ];
 </script>
