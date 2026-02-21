@@ -14,8 +14,12 @@ const settings = reactive({
   includeDivision: false,
   additionMin: 2,
   additionMax: 100,
+  additionMin2: 2,
+  additionMax2: 100,
   multiplicationMin: 2,
   multiplicationMax: 12,
+  multiplicationMin2: 2,
+  multiplicationMax2: 100,
   duration: 120,
 });
 
@@ -83,25 +87,23 @@ const generateQuestion = () => {
   let num1, num2, text, answer;
   if (operation === "addition") {
     num1 = randomInt(settings.additionMin, settings.additionMax);
-    num2 = randomInt(settings.additionMin, settings.additionMax);
+    num2 = randomInt(settings.additionMin2, settings.additionMax2);
     text = `${num1} + ${num2} =`;
     answer = num1 + num2;
   } else if (operation === "subtraction") {
-    // Generate two addends then ask for the difference, ensuring result is always positive
     num1 = randomInt(settings.additionMin, settings.additionMax);
-    num2 = randomInt(settings.additionMin, settings.additionMax);
+    num2 = randomInt(settings.additionMin2, settings.additionMax2);
     const total = num1 + num2;
     text = `${total} − ${num2} =`;
     answer = num1;
   } else if (operation === "multiplication") {
     num1 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
-    num2 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
+    num2 = randomInt(settings.multiplicationMin2, settings.multiplicationMax2);
     text = `${num1} × ${num2} =`;
     answer = num1 * num2;
   } else if (operation === "division") {
-    // Generate two factors then ask for the quotient — always a whole number
     num1 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
-    num2 = randomInt(settings.multiplicationMin, settings.multiplicationMax);
+    num2 = randomInt(settings.multiplicationMin2, settings.multiplicationMax2);
     const product = num1 * num2;
     text = `${product} ÷ ${num2} =`;
     answer = num1;
@@ -124,17 +126,17 @@ const clampPositiveInt = (field: keyof typeof settings) => {
   (settings[field] as number) = Math.max(1, Math.floor(isNaN(val) ? 1 : val));
 };
 
-const additionRangeError = computed(() =>
-  settings.additionMin >= settings.additionMax
-    ? "Min must be less than Max"
-    : null
-);
+const additionRangeError = computed(() => {
+  if (settings.additionMin >= settings.additionMax) return "First range: Min must be less than Max";
+  if (settings.additionMin2 >= settings.additionMax2) return "Second range: Min must be less than Max";
+  return null;
+});
 
-const multiplicationRangeError = computed(() =>
-  settings.multiplicationMin >= settings.multiplicationMax
-    ? "Min must be less than Max"
-    : null
-);
+const multiplicationRangeError = computed(() => {
+  if (settings.multiplicationMin >= settings.multiplicationMax) return "First range: Min must be less than Max";
+  if (settings.multiplicationMin2 >= settings.multiplicationMax2) return "Second range: Min must be less than Max";
+  return null;
+});
 
 const canStart = computed(() =>
   (settings.includeAddition || settings.includeSubtraction || settings.includeMultiplication || settings.includeDivision) &&
@@ -166,28 +168,22 @@ const checkAnswer = () => {
             <input type="checkbox" v-model="settings.includeAddition" />
             <span class="op-symbol">+</span>
             <span class="op-label">Addition</span>
-            <div class="range-inputs">
-              <input
-                type="number"
-                v-model.number="settings.additionMin"
-                placeholder="Min"
-                min="1"
-                step="1"
-                :class="{ 'input-error': additionRangeError }"
-                @keydown="blockInvalidKeys"
-                @blur="clampPositiveInt('additionMin')"
-              />
-              <span>–</span>
-              <input
-                type="number"
-                v-model.number="settings.additionMax"
-                placeholder="Max"
-                min="1"
-                step="1"
-                :class="{ 'input-error': additionRangeError }"
-                @keydown="blockInvalidKeys"
-                @blur="clampPositiveInt('additionMax')"
-              />
+            <div class="range-formula">
+              <div class="range-group" :class="{ 'input-error': settings.additionMin >= settings.additionMax }">
+                <span class="range-paren">(</span>
+                <input type="number" v-model.number="settings.additionMin" placeholder="Min" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('additionMin')" />
+                <span>–</span>
+                <input type="number" v-model.number="settings.additionMax" placeholder="Max" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('additionMax')" />
+                <span class="range-paren">)</span>
+              </div>
+              <span class="range-op">+</span>
+              <div class="range-group" :class="{ 'input-error': settings.additionMin2 >= settings.additionMax2 }">
+                <span class="range-paren">(</span>
+                <input type="number" v-model.number="settings.additionMin2" placeholder="Min" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('additionMin2')" />
+                <span>–</span>
+                <input type="number" v-model.number="settings.additionMax2" placeholder="Max" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('additionMax2')" />
+                <span class="range-paren">)</span>
+              </div>
             </div>
             <span v-if="additionRangeError" class="range-error">{{ additionRangeError }}</span>
           </label>
@@ -205,28 +201,22 @@ const checkAnswer = () => {
             <input type="checkbox" v-model="settings.includeMultiplication" />
             <span class="op-symbol">×</span>
             <span class="op-label">Multiplication</span>
-            <div class="range-inputs">
-              <input
-                type="number"
-                v-model.number="settings.multiplicationMin"
-                placeholder="Min"
-                min="1"
-                step="1"
-                :class="{ 'input-error': multiplicationRangeError }"
-                @keydown="blockInvalidKeys"
-                @blur="clampPositiveInt('multiplicationMin')"
-              />
-              <span>–</span>
-              <input
-                type="number"
-                v-model.number="settings.multiplicationMax"
-                placeholder="Max"
-                min="1"
-                step="1"
-                :class="{ 'input-error': multiplicationRangeError }"
-                @keydown="blockInvalidKeys"
-                @blur="clampPositiveInt('multiplicationMax')"
-              />
+            <div class="range-formula">
+              <div class="range-group" :class="{ 'input-error': settings.multiplicationMin >= settings.multiplicationMax }">
+                <span class="range-paren">(</span>
+                <input type="number" v-model.number="settings.multiplicationMin" placeholder="Min" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('multiplicationMin')" />
+                <span>–</span>
+                <input type="number" v-model.number="settings.multiplicationMax" placeholder="Max" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('multiplicationMax')" />
+                <span class="range-paren">)</span>
+              </div>
+              <span class="range-op">×</span>
+              <div class="range-group" :class="{ 'input-error': settings.multiplicationMin2 >= settings.multiplicationMax2 }">
+                <span class="range-paren">(</span>
+                <input type="number" v-model.number="settings.multiplicationMin2" placeholder="Min" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('multiplicationMin2')" />
+                <span>–</span>
+                <input type="number" v-model.number="settings.multiplicationMax2" placeholder="Max" min="1" step="1" @keydown="blockInvalidKeys" @blur="clampPositiveInt('multiplicationMax2')" />
+                <span class="range-paren">)</span>
+              </div>
             </div>
             <span v-if="multiplicationRangeError" class="range-error">{{ multiplicationRangeError }}</span>
           </label>
@@ -464,8 +454,36 @@ h1 {
 .range-inputs {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.25rem;
+  gap: 0.3rem;
+}
+
+.range-formula {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+  width: 100%;
+}
+
+.range-group {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.range-paren {
+  font-size: 1rem;
+  color: #aaa;
+  line-height: 1;
+}
+
+.range-op {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4a90e2;
+  text-align: center;
 }
 
 .range-note {
@@ -480,7 +498,7 @@ h1 {
   font-weight: 600;
 }
 
-.input-error {
+.input-error input {
   border-color: #e05252 !important;
   outline-color: #e05252;
 }
