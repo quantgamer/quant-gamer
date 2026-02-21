@@ -181,7 +181,6 @@ const checkAnswer = () => {
             type="number"
             v-model.number="userAnswer"
             @keyup="checkAnswer"
-            placeholder="?"
             autofocus
           />
         </div>
@@ -458,5 +457,16 @@ h1 {
 
 .start-btn:active {
   transform: scale(0.98);
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 </style>
