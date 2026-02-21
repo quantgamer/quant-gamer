@@ -121,7 +121,7 @@ const checkAnswer = () => {
             <input type="checkbox" v-model="settings.includeAddition" />
             <span class="op-symbol">+</span>
             <span class="op-label">Addition</span>
-            <div class="range-inputs" v-if="settings.includeAddition">
+            <div class="range-inputs" :class="{ hidden: !settings.includeAddition }">
               <input
                 type="number"
                 v-model.number="settings.additionMin"
@@ -140,7 +140,7 @@ const checkAnswer = () => {
             <input type="checkbox" v-model="settings.includeMultiplication" />
             <span class="op-symbol">×</span>
             <span class="op-label">Multiplication</span>
-            <div class="range-inputs" v-if="settings.includeMultiplication">
+            <div class="range-inputs" :class="{ hidden: !settings.includeMultiplication }">
               <input
                 type="number"
                 v-model.number="settings.multiplicationMin"
@@ -381,6 +381,10 @@ h1 {
   align-items: center;
   gap: 0.4rem;
   margin-top: 0.25rem;
+}
+
+.range-inputs.hidden {
+  visibility: hidden;
 }
 
 .range-inputs input {
