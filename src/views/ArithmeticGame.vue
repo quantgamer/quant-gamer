@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, type Reactive } from "vue";
+import { reactive, ref, nextTick, type Reactive } from "vue";
 
 const gameStarted = ref(false);
 const score = ref(0);
@@ -82,10 +82,14 @@ const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+const answerInput = ref<HTMLInputElement | null>(null);
+
 const checkAnswer = () => {
   if (userAnswer.value === currentQuestion.answer) {
     score.value += 1;
+    userAnswer.value = null;
     generateQuestion();
+    nextTick(() => answerInput.value?.focus());
   }
 };
 </script>
@@ -149,6 +153,7 @@ const checkAnswer = () => {
         <div v-if="currentQuestion">
           <p>{{ currentQuestion.text }}</p>
           <input
+            ref="answerInput"
             type="number"
             v-model.number="userAnswer"
             @keyup="checkAnswer"
