@@ -1,6 +1,6 @@
-# vue-project
+# Quant Gamer
 
-This template should help get you started developing with Vue 3 in Vite.
+A Vue 3 web app for practicing mental arithmetic. Practice addition and multiplication with configurable difficulty, timed rounds, and score tracking.
 
 ## Recommended IDE Setup
 
@@ -62,3 +62,13 @@ npm run test:e2e -- --debug
 ```sh
 npm run lint
 ```
+
+## Deploy
+
+Push your code to GitHub, then run:
+
+```sh
+npm run deploy
+```
+
+This runs `predeploy` (build) and publishes the `dist/` folder to the `gh-pages` branch.
