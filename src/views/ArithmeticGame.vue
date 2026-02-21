@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, nextTick, type Reactive } from "vue";
+import { reactive, ref, computed, nextTick, type Reactive } from "vue";
 
 const gameStarted = ref(false);
 const score = ref(0);
@@ -115,6 +115,33 @@ const randomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+const blockInvalidKeys = (e: KeyboardEvent) => {
+  if (["-", "+", ".", "e", "E"].includes(e.key)) e.preventDefault();
+};
+
+const clampPositiveInt = (field: keyof typeof settings) => {
+  const val = settings[field] as number;
+  (settings[field] as number) = Math.max(1, Math.floor(isNaN(val) ? 1 : val));
+};
+
+const additionRangeError = computed(() =>
+  settings.additionMin >= settings.additionMax
+    ? "Min must be less than Max"
+    : null
+);
+
+const multiplicationRangeError = computed(() =>
+  settings.multiplicationMin >= settings.multiplicationMax
+    ? "Min must be less than Max"
+    : null
+);
+
+const canStart = computed(() =>
+  (settings.includeAddition || settings.includeSubtraction || settings.includeMultiplication || settings.includeDivision) &&
+  !(additionRangeError.value) &&
+  !(multiplicationRangeError.value)
+);
+
 const answerInput = ref<HTMLInputElement | null>(null);
 
 const checkAnswer = () => {
@@ -135,7 +162,7 @@ const checkAnswer = () => {
         <p class="settings-subtitle">Choose your operations and ranges</p>
 
         <div class="operation-cards">
-          <label class="operation-card" :class="{ active: settings.includeAddition }">
+          <label class="operation-card" :class="{ active: settings.includeAddition, error: additionRangeError }">
             <input type="checkbox" v-model="settings.includeAddition" />
             <span class="op-symbol">+</span>
             <span class="op-label">Addition</span>
@@ -144,14 +171,25 @@ const checkAnswer = () => {
                 type="number"
                 v-model.number="settings.additionMin"
                 placeholder="Min"
+                min="1"
+                step="1"
+                :class="{ 'input-error': additionRangeError }"
+                @keydown="blockInvalidKeys"
+                @blur="clampPositiveInt('additionMin')"
               />
               <span>–</span>
               <input
                 type="number"
                 v-model.number="settings.additionMax"
                 placeholder="Max"
+                min="1"
+                step="1"
+                :class="{ 'input-error': additionRangeError }"
+                @keydown="blockInvalidKeys"
+                @blur="clampPositiveInt('additionMax')"
               />
             </div>
+            <span v-if="additionRangeError" class="range-error">{{ additionRangeError }}</span>
           </label>
 
           <label class="operation-card" :class="{ active: settings.includeSubtraction }">
@@ -163,7 +201,7 @@ const checkAnswer = () => {
             </div>
           </label>
 
-          <label class="operation-card" :class="{ active: settings.includeMultiplication }">
+          <label class="operation-card" :class="{ active: settings.includeMultiplication, error: multiplicationRangeError }">
             <input type="checkbox" v-model="settings.includeMultiplication" />
             <span class="op-symbol">×</span>
             <span class="op-label">Multiplication</span>
@@ -172,14 +210,25 @@ const checkAnswer = () => {
                 type="number"
                 v-model.number="settings.multiplicationMin"
                 placeholder="Min"
+                min="1"
+                step="1"
+                :class="{ 'input-error': multiplicationRangeError }"
+                @keydown="blockInvalidKeys"
+                @blur="clampPositiveInt('multiplicationMin')"
               />
               <span>–</span>
               <input
                 type="number"
                 v-model.number="settings.multiplicationMax"
                 placeholder="Max"
+                min="1"
+                step="1"
+                :class="{ 'input-error': multiplicationRangeError }"
+                @keydown="blockInvalidKeys"
+                @blur="clampPositiveInt('multiplicationMax')"
               />
             </div>
+            <span v-if="multiplicationRangeError" class="range-error">{{ multiplicationRangeError }}</span>
           </label>
 
           <label class="operation-card" :class="{ active: settings.includeDivision }">
@@ -202,7 +251,7 @@ const checkAnswer = () => {
           </label>
         </div>
 
-        <button class="start-btn" @click="startGame">Start Game</button>
+        <button class="start-btn" @click="startGame" :disabled="!canStart">Start Game</button>
       </div>
       <div v-if="gameStarted && !gameOver" class="game">
         <div class="game-stats">
@@ -423,6 +472,28 @@ h1 {
   font-size: 0.78rem;
   color: #aaa;
   font-style: italic;
+}
+
+.range-error {
+  font-size: 0.75rem;
+  color: #e05252;
+  font-weight: 600;
+}
+
+.input-error {
+  border-color: #e05252 !important;
+  outline-color: #e05252;
+}
+
+.operation-card.error {
+  border-color: #e05252;
+  background: #fff5f5;
+}
+
+.start-btn:disabled {
+  background: #b0c9e8;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .range-inputs input {
