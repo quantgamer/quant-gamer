@@ -19,6 +19,11 @@ const router = createRouter({
       name: "probabilitygame",
       component: () => import("../views/ProbabilityGame.vue"),
     },
+    {
+      path: "/percentagegame",
+      name: "percentagegame",
+      component: () => import("../views/PercentageGame.vue"),
+    },
   ],
 });
 

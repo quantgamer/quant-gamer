@@ -16,6 +16,14 @@ const games = [
     route: "/probabilitygame",
     available: true,
   },
+  {
+    id: "percentage",
+    title: "Percentage",
+    description: "Calculate what percentage one number is of another — exactly or to the nearest whole percent.",
+    symbol: "≈%",
+    route: "/percentagegame",
+    available: true,
+  },
 ];
 </script>
 
