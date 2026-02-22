@@ -331,7 +331,7 @@ const formatProb = (p: number) => `${Math.round(p * 100)}%`;
               v-model.number="userAnswer"
               @keyup.enter="checkAnswer"
               @keydown="blockInvalidKeys"
-              placeholder="?"
+              placeholder=""
               autofocus
             />
             <span class="answer-unit">{{ currentQuestion.unit }}</span>
