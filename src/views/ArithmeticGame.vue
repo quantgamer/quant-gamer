@@ -597,4 +597,19 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+nav {
+  margin-top: 2rem;
+}
+
+nav a {
+  color: #4a90e2;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
 </style>
